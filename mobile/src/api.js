@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // (see server/README.md). While developing with Expo Go on a physical
 // device, "localhost" will NOT work — use your computer's LAN IP instead,
 // e.g. "http://192.168.1.20:4000".
-export const API_BASE_URL = 'https://172.20.10.2:4000';
+export const API_BASE_URL = 'https://fitforgeapp-production.up.railway.app/';
 
 const api = axios.create({ baseURL: API_BASE_URL, timeout: 15000 });
 

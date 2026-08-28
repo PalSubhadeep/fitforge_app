@@ -9,13 +9,20 @@
     "splash": {
       "backgroundColor": "#14171A"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "android": {
       "package": "com.fitforge.app",
       "backgroundColor": "#14171A"
     },
     "ios": {
       "bundleIdentifier": "com.fitforge.app"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7d6841a3-997c-4ba3-80c9-b88b0eb95636"
+      }
     }
   }
 }
