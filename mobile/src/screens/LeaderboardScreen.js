@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, spacing, radius } from '../theme';
@@ -8,7 +8,7 @@ import { useAuth, apiErrorMessage } from '../context/AuthContext';
 import api from '../api';
 
 export default function LeaderboardScreen() {
-  const { user } = useAuth();
+  const { user, leaderboardVersion } = useAuth();
   const [board, setBoard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -26,6 +26,7 @@ export default function LeaderboardScreen() {
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
+  useEffect(() => { load(); }, [leaderboardVersion, load]);
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>

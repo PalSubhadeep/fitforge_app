@@ -15,6 +15,15 @@ const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN === '*' ? true : (process.env.CORS_ORIGIN || '').split(',') }));
 app.use(express.json());
 
+// Prevent mobile OS networking layers (Android OkHttp in particular) from caching
+// GET responses — without this, screens like the leaderboard can show stale data
+// even though the server already has fresh numbers.
+app.use('/api', (req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.set('Pragma', 'no-cache');
+  next();
+});
+
 app.get('/', (req, res) => res.json({ ok: true, service: 'fitforge-server' }));
 app.get('/health', (req, res) => res.json({ status: 'healthy' }));
 

@@ -6,6 +6,8 @@ import { useAuth, apiErrorMessage } from '../context/AuthContext';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { computeStreaks, todayISO } from '../utils/streaks';
+import { getMotivationalMessage, getStreakReminderMessage } from '../utils/motivation';
+import { refreshDynamicNotificationContent } from '../utils/notifications';
 import api from '../api';
 
 export default function HomeScreen({ navigation }) {
@@ -13,6 +15,7 @@ export default function HomeScreen({ navigation }) {
   const [rank, setRank] = useState(null);
   const [todayCounts, setTodayCounts] = useState({ workouts: 0, food: 0 });
   const [streaks, setStreaks] = useState({ streakCurrent: 0, cleanStreakCurrent: 0 });
+  const [motivation, setMotivation] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -33,7 +36,18 @@ export default function HomeScreen({ navigation }) {
         workouts: actRes.data.activities.filter((a) => a.date === t).length,
         food: foodRes.data.food.filter((f) => f.date === t).length
       });
-      setStreaks(computeStreaks(actRes.data.activities, foodRes.data.food));
+      const computedStreaks = computeStreaks(actRes.data.activities, foodRes.data.food);
+      setStreaks(computedStreaks);
+
+      const message = getMotivationalMessage(actRes.data.activities, foodRes.data.food, computedStreaks);
+      setMotivation(message);
+
+      // Keep the streak/motivational notifications' text current with the latest
+      // data, without ever sending anything immediately or duplicating a schedule.
+      refreshDynamicNotificationContent({
+        streakBody: getStreakReminderMessage(computedStreaks),
+        motivationalBody: message
+      }).catch(() => {});
     } catch (e) {
       setError(apiErrorMessage(e));
     } finally {
@@ -59,6 +73,13 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.logoutText}>Log out</Text>
           </TouchableOpacity>
         </View>
+
+        {!!motivation && (
+          <View style={styles.banner}>
+            <Text style={styles.bannerTag}>Today</Text>
+            <Text style={styles.bannerText}>{motivation}</Text>
+          </View>
+        )}
 
         <View style={styles.scoreboard}>
           <Text style={styles.scoreLabel}>Total Points</Text>
@@ -125,6 +146,9 @@ const styles = StyleSheet.create({
   sub: { color: colors.muted, fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 },
   logoutBtn: { borderWidth: 1, borderColor: colors.line, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6 },
   logoutText: { color: colors.muted, fontSize: 11, textTransform: 'uppercase' },
+  banner: { backgroundColor: 'rgba(232,172,61,0.10)', borderWidth: 1, borderColor: colors.gold, borderRadius: radius.lg, padding: 14, marginBottom: spacing.md },
+  bannerTag: { color: colors.gold, fontSize: 10, textTransform: 'uppercase', letterSpacing: 1.5, fontWeight: '700' },
+  bannerText: { color: colors.text, fontSize: 14, marginTop: 6, lineHeight: 19 },
   scoreboard: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg, padding: 20, alignItems: 'center', marginBottom: spacing.md },
   scoreLabel: { color: colors.muted, fontSize: 11, textTransform: 'uppercase', letterSpacing: 2 },
   scoreValue: { color: colors.gold, fontSize: 44, fontWeight: '800', marginVertical: 6 },

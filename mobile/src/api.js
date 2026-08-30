@@ -5,13 +5,22 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // (see server/README.md). While developing with Expo Go on a physical
 // device, "localhost" will NOT work — use your computer's LAN IP instead,
 // e.g. "http://192.168.1.20:4000".
-export const API_BASE_URL = 'https://fitforgeapp-production.up.railway.app/';
+export const API_BASE_URL = 'https://fitforge-6wbk.onrender.com';
 
-const api = axios.create({ baseURL: API_BASE_URL, timeout: 15000 });
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: { 'Cache-Control': 'no-cache' }
+});
 
 api.interceptors.request.use(async (config) => {
   const token = await AsyncStorage.getItem('fitforge_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
+  // Cache-bust GET requests specifically — some mobile networking stacks cache
+  // GET responses even without explicit server caching headers.
+  if ((config.method || 'get').toLowerCase() === 'get') {
+    config.params = { ...(config.params || {}), _t: Date.now() };
+  }
   return config;
 });
 

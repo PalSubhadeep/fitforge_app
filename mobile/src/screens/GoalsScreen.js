@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, spacing, radius } from '../theme';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import api, { apiErrorMessage } from '../api';
 
@@ -57,7 +58,8 @@ export default function GoalsScreen() {
   });
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <KeyboardAvoider style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <ResponsiveContainer>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Your Goals</Text>
@@ -97,6 +99,7 @@ export default function GoalsScreen() {
       </View>
       </ResponsiveContainer>
 </ScrollView>
+</KeyboardAvoider>
   );
 }
 

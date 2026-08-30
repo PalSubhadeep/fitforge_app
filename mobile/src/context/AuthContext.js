@@ -7,6 +7,10 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [booting, setBooting] = useState(true);
+  // Bumped every time points change anywhere in the app. LeaderboardScreen watches
+  // this (in addition to its own focus effect) so it reflects new points immediately
+  // instead of waiting for the tab to regain focus.
+  const [leaderboardVersion, setLeaderboardVersion] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -52,10 +56,11 @@ export function AuthProvider({ children }) {
 
   function updatePoints(delta) {
     setUser((u) => (u ? { ...u, points: u.points + delta } : u));
+    setLeaderboardVersion((v) => v + 1);
   }
 
   return (
-    <AuthContext.Provider value={{ user, booting, login, signup, verify, resendCode, logout, updatePoints }}>
+    <AuthContext.Provider value={{ user, booting, login, signup, verify, resendCode, logout, updatePoints, leaderboardVersion }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,6 +5,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { colors, spacing, radius } from '../theme';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import { useAuth, apiErrorMessage } from '../context/AuthContext';
 import api from '../api';
 
@@ -53,7 +54,8 @@ export default function ActivityScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <KeyboardAvoider>
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <ResponsiveContainer>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Log a Workout</Text>
@@ -102,6 +104,7 @@ export default function ActivityScreen() {
       </View>
       </ResponsiveContainer>
 </ScrollView>
+</KeyboardAvoider>
 </SafeAreaView>
   );
 }

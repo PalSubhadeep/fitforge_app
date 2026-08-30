@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Activi
 import { colors, spacing, radius } from '../theme';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import { useAuth, apiErrorMessage } from '../context/AuthContext';
 
 export default function SignupScreen({ navigation }) {
@@ -37,7 +38,8 @@ export default function SignupScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <KeyboardAvoider>
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <ResponsiveContainer>
       <View style={styles.brand}>
         <View style={styles.mark}><Text style={styles.markText}>FF</Text></View>
@@ -75,6 +77,7 @@ export default function SignupScreen({ navigation }) {
       </TouchableOpacity>
       </ResponsiveContainer>
 </ScrollView>
+</KeyboardAvoider>
 </SafeAreaView>
   );
 }

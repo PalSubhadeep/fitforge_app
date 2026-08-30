@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { colors, spacing, radius } from '../theme';
 import ResponsiveContainer from '../components/ResponsiveContainer';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, apiErrorMessage } from '../context/AuthContext';
 
@@ -27,33 +28,35 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ResponsiveContainer>
-        <View style={styles.brand}>
-          <View style={styles.mark}><Text style={styles.markText}>FF</Text></View>
-          <Text style={styles.title}>FITFORGE</Text>
-          <Text style={styles.tagline}>Train. Track. Compete.</Text>
-        </View>
+      <KeyboardAvoider>
+        <ResponsiveContainer>
+          <View style={styles.brand}>
+            <View style={styles.mark}><Text style={styles.markText}>FF</Text></View>
+            <Text style={styles.title}>FITFORGE</Text>
+            <Text style={styles.tagline}>Train. Track. Compete.</Text>
+          </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Username</Text>
-          <TextInput style={styles.input} value={username} onChangeText={setUsername}
-            autoCapitalize="none" placeholder="your username" placeholderTextColor={colors.muted} />
+          <View style={styles.card}>
+            <Text style={styles.label}>Username</Text>
+            <TextInput style={styles.input} value={username} onChangeText={setUsername}
+              autoCapitalize="none" placeholder="your username" placeholderTextColor={colors.muted} />
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput style={styles.input} value={password} onChangeText={setPassword}
-            secureTextEntry placeholder="********" placeholderTextColor={colors.muted} />
+            <Text style={styles.label}>Password</Text>
+            <TextInput style={styles.input} value={password} onChangeText={setPassword}
+              secureTextEntry placeholder="********" placeholderTextColor={colors.muted} />
 
-          <TouchableOpacity style={styles.btn} onPress={handleLogin} disabled={loading}>
-            {loading ? <ActivityIndicator color="#1A1502" /> : <Text style={styles.btnText}>Log In</Text>}
+            <TouchableOpacity style={styles.btn} onPress={handleLogin} disabled={loading}>
+              {loading ? <ActivityIndicator color="#1A1502" /> : <Text style={styles.btnText}>Log In</Text>}
+            </TouchableOpacity>
+
+            {!!error && <Text style={styles.error}>{error}</Text>}
+          </View>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
+            <Text style={styles.switchText}>New here? Create an account</Text>
           </TouchableOpacity>
-
-          {!!error && <Text style={styles.error}>{error}</Text>}
-        </View>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-          <Text style={styles.switchText}>New here? Create an account</Text>
-        </TouchableOpacity>
-      </ResponsiveContainer>
+        </ResponsiveContainer>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

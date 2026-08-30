@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { colors, spacing, radius } from '../theme';
 import ResponsiveContainer from '../components/ResponsiveContainer';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth, apiErrorMessage } from '../context/AuthContext';
 
@@ -44,34 +45,36 @@ export default function VerifyScreen({ route }) {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ResponsiveContainer>
-        <View style={styles.card}>
-          <Text style={styles.title}>Check your email</Text>
-          <Text style={styles.desc}>We sent a 6-digit code to{'\n'}<Text style={styles.email}>{email}</Text></Text>
+      <KeyboardAvoider>
+        <ResponsiveContainer>
+          <View style={styles.card}>
+            <Text style={styles.title}>Check your email</Text>
+            <Text style={styles.desc}>We sent a 6-digit code to{'\n'}<Text style={styles.email}>{email}</Text></Text>
 
-          <Text style={styles.label}>Verification code</Text>
-          <TextInput
-            style={styles.codeInput}
-            value={code}
-            onChangeText={setCode}
-            keyboardType="number-pad"
-            maxLength={6}
-            placeholder="000000"
-            placeholderTextColor={colors.muted}
-          />
+            <Text style={styles.label}>Verification code</Text>
+            <TextInput
+              style={styles.codeInput}
+              value={code}
+              onChangeText={setCode}
+              keyboardType="number-pad"
+              maxLength={6}
+              placeholder="000000"
+              placeholderTextColor={colors.muted}
+            />
 
-          <TouchableOpacity style={styles.btn} onPress={handleVerify} disabled={loading}>
-            {loading ? <ActivityIndicator color="#1A1502" /> : <Text style={styles.btnText}>Verify & Create Account</Text>}
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.btn} onPress={handleVerify} disabled={loading}>
+              {loading ? <ActivityIndicator color="#1A1502" /> : <Text style={styles.btnText}>Verify & Create Account</Text>}
+            </TouchableOpacity>
 
-          {!!error && <Text style={styles.error}>{error}</Text>}
-          {!!info && <Text style={styles.ok}>{info}</Text>}
+            {!!error && <Text style={styles.error}>{error}</Text>}
+            {!!info && <Text style={styles.ok}>{info}</Text>}
 
-          <TouchableOpacity onPress={handleResend} disabled={resending} style={{ marginTop: 16 }}>
-            <Text style={styles.resend}>{resending ? 'Sending…' : "Didn't get a code? Resend"}</Text>
-          </TouchableOpacity>
-        </View>
-      </ResponsiveContainer>
+            <TouchableOpacity onPress={handleResend} disabled={resending} style={{ marginTop: 16 }}>
+              <Text style={styles.resend}>{resending ? 'Sending…' : "Didn't get a code? Resend"}</Text>
+            </TouchableOpacity>
+          </View>
+        </ResponsiveContainer>
+      </KeyboardAvoider>
     </SafeAreaView>
   );
 }

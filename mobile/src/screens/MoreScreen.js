@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 const ITEMS = [
   { key: 'Goals', icon: '🎯', title: 'Goals', desc: 'Set targets with a deadline' },
   { key: 'Routine', icon: '📋', title: 'Daily Routine', desc: 'Set and check off your routine' },
+  { key: 'Notifications', icon: '🔔', title: 'Notifications', desc: 'Turn reminders on or off' },
   { key: 'Water', icon: '💧', title: 'Water Tracker', desc: 'Log bottles against your capacity' },
   { key: 'Weight', icon: '⚖️', title: 'Weight Tracker', desc: 'Log and follow your weight over time' },
   { key: 'Calories', icon: '🍽️', title: 'Calorie Calculator', desc: 'Estimate your daily calorie needs' },

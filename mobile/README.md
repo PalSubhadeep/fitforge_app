@@ -120,3 +120,56 @@ the screen is wider than a phone. Stat rows and grids also use `flexWrap` so the
 instead of overflowing on narrow devices.
 
 
+## Notification system
+
+Under **More → Notifications**, five categories can each be toggled independently:
+
+| Category | Default time | Behavior |
+|---|---|---|
+| Daily fitness reminder | 8:00 AM | Static prompt to plan today's workout |
+| Water reminder | 1:00 PM | Static hydration nudge |
+| Routine reminder | 6:00 PM | Static prompt to check off today's routine |
+| Streak reminder | 8:30 PM | Rule-based — reflects your current streak |
+| Motivational notification | 9:00 PM | Rule-based — see below |
+
+**Anti-spam design**: every category schedules under one fixed identifier
+(`src/utils/notifications.js`). Turning a category on always cancels-then-recreates under
+that same identifier, so it is structurally impossible for a category to stack duplicate
+notifications — there is never more than one pending notification per category, ever.
+
+**Local-only, not push**: these are on-device scheduled notifications via `expo-notifications`,
+not server-sent push notifications. That means no backend push infrastructure was needed, but
+also means they only fire reliably while the app has run recently enough for the OS to keep the
+schedule active — this is normal for local notifications and not a bug.
+
+## Motivational system (`src/utils/motivation.js`)
+
+Rule-based, not AI, evaluated in this priority order:
+1. Streak ≥ 7 days → celebrates the streak.
+2. Streak ≥ 3 days → acknowledges building momentum.
+3. No activity in 3+ days (but has logged before) → gentle nudge, never guilt.
+4. This week's training hours vs. last week → congratulates improvement, or offers
+   encouragement (not criticism) on a dip.
+5. Exact same weekday last week has a logged activity → references it directly
+   ("Last Tuesday you ran — 5km. What about today?").
+6. Otherwise → one of six general positive quotes, rotated deterministically by
+   day-of-year (stable all day, not random per render).
+
+Every branch is worded to avoid shame — there is no message anywhere that criticizes a
+missed workout or a junk food day. This same function powers both the Home screen banner
+and the motivational notification's content.
+
+## Known bug fixes in this version
+
+- **Keyboard covering inputs**: every screen with a text field is wrapped in
+  `src/components/KeyboardAvoider.js`, and all relevant `ScrollView`s use
+  `keyboardShouldPersistTaps="handled"` so buttons work without dismissing the keyboard first.
+- **Leaderboard not refreshing**: the server now sends `Cache-Control: no-store` on all
+  `/api/*` responses (mobile networking stacks can cache GET requests even without this),
+  the client also cache-busts GET calls, and `AuthContext` exposes a `leaderboardVersion`
+  counter that `LeaderboardScreen` watches so it refetches the instant points change
+  anywhere in the app — not just when the tab regains focus.
+- **Missing app icon**: `app.json` previously had no `icon` field and no asset files existed
+  at all. Real icons now live in `mobile/assets/` (main icon, Android adaptive icon, splash
+  icon, web favicon, and a proper monochrome Android notification icon) and are wired into
+  `app.json` correctly.

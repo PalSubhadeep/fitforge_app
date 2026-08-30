@@ -8,6 +8,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { colors } from './src/theme';
+import { ensureAndroidChannel } from './src/utils/notifications';
 
 import SignupScreen from './src/screens/SignupScreen';
 import VerifyScreen from './src/screens/VerifyScreen';
@@ -25,6 +26,7 @@ import GoalsScreen from './src/screens/GoalsScreen';
 import CaloriesScreen from './src/screens/CaloriesScreen';
 import WeeklyScreen from './src/screens/WeeklyScreen';
 import MonthlyScreen from './src/screens/MonthlyScreen';
+import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
 
 const AuthStack = createNativeStackNavigator();
 const MoreStack = createNativeStackNavigator();
@@ -61,6 +63,7 @@ function MoreNavigator() {
       <MoreStack.Screen name="Calories" component={CaloriesScreen} options={{ title: 'Calorie Calculator' }} />
       <MoreStack.Screen name="Weekly" component={WeeklyScreen} options={{ title: 'Weekly Summary' }} />
       <MoreStack.Screen name="Monthly" component={MonthlyScreen} options={{ title: 'Monthly Analysis' }} />
+      <MoreStack.Screen name="Notifications" component={NotificationSettingsScreen} options={{ title: 'Notifications' }} />
     </MoreStack.Navigator>
   );
 }
@@ -109,6 +112,7 @@ function Root() {
 }
 
 export default function App() {
+  React.useEffect(() => { ensureAndroidChannel(); }, []);
   return (
     <SafeAreaProvider>
       <AuthProvider>

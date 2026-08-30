@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { colors, spacing, radius } from '../theme';
+import KeyboardAvoider from '../components/KeyboardAvoider';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 
 const ACTIVITY_LEVELS = [
@@ -33,7 +34,8 @@ export default function CaloriesScreen() {
   }
 
   return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+    <KeyboardAvoider style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <ResponsiveContainer>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Estimate Daily Calories</Text>
@@ -88,6 +90,7 @@ export default function CaloriesScreen() {
         </View>
       </ResponsiveContainer>
     </ScrollView>
+    </KeyboardAvoider>
   );
 }
 
