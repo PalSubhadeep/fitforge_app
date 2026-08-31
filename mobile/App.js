@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { colors } from './src/theme';
 import { ensureAndroidChannel } from './src/utils/notifications';
+import ErrorBoundary from './src/components/ErrorBoundary';
 
 import SignupScreen from './src/screens/SignupScreen';
 import VerifyScreen from './src/screens/VerifyScreen';
@@ -114,11 +115,13 @@ function Root() {
 export default function App() {
   React.useEffect(() => { ensureAndroidChannel(); }, []);
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <Root />
-      </AuthProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <Root />
+        </AuthProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 

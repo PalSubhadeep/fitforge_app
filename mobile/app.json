@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#14171A"
-    },
     "assetBundlePatterns": ["**/*"],
     "android": {
       "package": "com.fitforge.app",
@@ -31,6 +26,14 @@
         {
           "icon": "./assets/notification-icon.png",
           "color": "#E8AC3D"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#14171A"
         }
       ]
     ]

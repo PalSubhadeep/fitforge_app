@@ -16,29 +16,40 @@ const DESCRIPTIONS = {
 export default function NotificationSettingsScreen() {
   const [prefs, setPrefs] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const load = useCallback(async () => {
-    const p = await getAllPreferences();
-    setPrefs(p);
-    setLoading(false);
+    setError('');
+    try {
+      const p = await getAllPreferences();
+      setPrefs(p);
+    } catch (e) {
+      setError('Could not load notification settings: ' + (e?.message || String(e)));
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   async function toggle(category) {
-    const next = !prefs[category];
-    if (next) {
-      const granted = await requestPermissions();
-      if (!granted) {
-        Alert.alert(
-          'Notifications disabled',
-          'FitForge needs notification permission to send reminders. You can enable it in your phone settings.'
-        );
-        return;
+    try {
+      const next = !prefs[category];
+      if (next) {
+        const granted = await requestPermissions();
+        if (!granted) {
+          Alert.alert(
+            'Notifications disabled',
+            'FitForge needs notification permission to send reminders. You can enable it in your phone settings.'
+          );
+          return;
+        }
       }
+      setPrefs((p) => ({ ...p, [category]: next }));
+      await setCategoryEnabled(category, next);
+    } catch (e) {
+      Alert.alert('Could not update this reminder', e?.message || String(e));
     }
-    setPrefs((p) => ({ ...p, [category]: next }));
-    await setCategoryEnabled(category, next);
   }
 
   return (
@@ -50,6 +61,7 @@ export default function NotificationSettingsScreen() {
             Each reminder fires at most once a day and never stacks — turning one off
             cancels it immediately, and turning it back on simply reschedules it.
           </Text>
+          {!!error && <Text style={styles.error}>{error}</Text>}
 
           {Object.keys(CATEGORIES).map((key) => {
             const cfg = CATEGORIES[key];
@@ -82,6 +94,7 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.line, borderRadius: radius.lg, padding: spacing.md },
   cardTitle: { color: colors.text, fontSize: 17, fontWeight: '800', marginBottom: 8 },
   hint: { color: colors.muted, fontSize: 12, marginBottom: 14, lineHeight: 17 },
+  error: { color: colors.red, fontSize: 12, marginBottom: 10 },
   row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderTopWidth: 1, borderTopColor: colors.line, gap: 12 },
   rowTitle: { color: colors.text, fontWeight: '700', fontSize: 14 },
   rowDesc: { color: colors.muted, fontSize: 11, marginTop: 2 },
