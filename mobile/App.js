@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -116,11 +117,17 @@ export default function App() {
   React.useEffect(() => { ensureAndroidChannel(); }, []);
   return (
     <ErrorBoundary>
-      <SafeAreaProvider>
-        <AuthProvider>
-          <Root />
-        </AuthProvider>
-      </SafeAreaProvider>
+      {/* statusBarTranslucent/navigationBarTranslucent are set true because Android
+          edge-to-edge display is forced on as of SDK 54 — the app always draws behind
+          the system bars now, so the keyboard controller needs to know that to
+          calculate correct keyboard-avoiding offsets. */}
+      <KeyboardProvider statusBarTranslucent navigationBarTranslucent>
+        <SafeAreaProvider>
+          <AuthProvider>
+            <Root />
+          </AuthProvider>
+        </SafeAreaProvider>
+      </KeyboardProvider>
     </ErrorBoundary>
   );
 }

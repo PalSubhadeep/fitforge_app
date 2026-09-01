@@ -1,15 +1,19 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 465,
+  secure: process.env.SMTP_SECURE !== 'false',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
 
-// While your Resend account is unverified for a custom domain, Resend only allows
-// sending TO your own account email, and FROM their shared testing address
-// (onboarding@resend.dev). Once you verify a domain at resend.com/domains, change
-// RESEND_FROM in .env to an address on that domain and this works for anyone.
 async function sendVerificationCode(toEmail, fullName, code) {
-  const { data, error } = await resend.emails.send({
-    from: process.env.RESEND_FROM || 'FitForge <onboarding@resend.dev>',
+  const info = await transporter.sendMail({
+    from: process.env.SMTP_FROM || process.env.SMTP_USER,
     to: toEmail,
     subject: 'Your FitForge verification code',
     text: `Hi ${fullName},\n\nYour FitForge verification code is: ${code}\n\nThis code expires in 15 minutes. If you didn't request this, you can ignore this email.`,
@@ -24,12 +28,7 @@ async function sendVerificationCode(toEmail, fullName, code) {
     `
   });
 
-  if (error) {
-    console.error(`[mailer] Resend rejected the email to ${toEmail}:`, error);
-    throw new Error(error.message || 'Email provider rejected the message.');
-  }
-
-  console.log(`[mailer] Sent to ${toEmail} — Resend id: ${data?.id}`);
+  console.log(`[mailer] Sent to ${toEmail} — messageId: ${info.messageId} — accepted: ${JSON.stringify(info.accepted)} — rejected: ${JSON.stringify(info.rejected)}`);
 }
 
 module.exports = { sendVerificationCode };

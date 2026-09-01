@@ -42,30 +42,37 @@ npm start
 
 Visit `http://localhost:4000/health` — you should see `{"status":"healthy"}`.
 
-## 2. Setting up email sending (Resend)
+## 2. Setting up email sending (Gmail SMTP)
 
-This backend sends verification emails through **Resend's API** directly (not raw SMTP),
-using their official Node SDK.
+This backend sends verification emails through **your own Gmail account** via SMTP,
+using an App Password (not your normal Google password).
 
-1. Sign up free at [resend.com](https://resend.com) — no credit card needed.
-2. Go to **API Keys** → **Create API Key** → copy it.
+1. Turn on **2-Step Verification** on the Gmail account you'll send from:
+   `myaccount.google.com/security`
+2. Create an App Password: `myaccount.google.com/apppasswords` → choose "Mail" →
+   you'll get a 16-character password.
 3. In your `.env`:
    ```
-   RESEND_API_KEY=re_your_actual_key
-   RESEND_FROM="FitForge <onboarding@resend.dev>"
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=465
+   SMTP_SECURE=true
+   SMTP_USER=youraddress@gmail.com
+   SMTP_PASS=your16characterapppassword
+   SMTP_FROM="FitForge <youraddress@gmail.com>"
    ```
-4. **Important limitation until you verify a domain**: a brand-new Resend account can
-   only send emails *to* the address you signed up with, and *from* their shared
-   `onboarding@resend.dev` address. This is enough to fully test signup yourself, but
-   other people's signups will fail with a `403`/validation error until you verify a
-   domain (see below) — and that error will be logged clearly by the server, not silent.
-5. To let anyone sign up: buy/own a domain, go to **Domains → Add Domain** on Resend,
-   add the DNS records it gives you at your registrar, wait for verification, then
-   change `RESEND_FROM` to an address on that domain (e.g. `no-reply@yourdomain.com`).
+4. **No recipient restriction**: unlike a brand-new Resend account, a Gmail App Password
+   can send to any email address immediately — no domain verification step, no
+   "only your own email" limit. This is what actually lets every signer-upper receive
+   their code, not just you.
+5. If you ever change `.env`, restart the server (`Ctrl+C` then `npm start`) — Node only
+   reads `.env` once at startup.
 
 Every send attempt is logged to your server console — either
-`[mailer] Sent to ... — Resend id: ...` on success, or a clear error object on failure —
-so you never have to guess whether an email actually went out.
+`[mailer] Sent to ... — messageId: ...` on success, or a thrown error with details on
+failure — so you never have to guess whether an email actually went out. Gmail SMTP mail
+can occasionally land in spam on the first few sends to a new recipient; that's a
+deliverability quirk of using a personal Gmail account rather than a dedicated
+transactional email service, not a bug in this code.
 
 ## 3. Hosting the database (MySQL)
 
