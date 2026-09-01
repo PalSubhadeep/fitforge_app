@@ -5,6 +5,7 @@ import { colors, spacing, radius } from '../theme';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import KeyboardAvoider from '../components/KeyboardAvoider';
+import Toast from '../components/Toast';
 import { useAuth, apiErrorMessage } from '../context/AuthContext';
 import api from '../api';
 
@@ -18,6 +19,7 @@ export default function FoodScreen() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [list, setList] = useState([]);
+  const [toastVisible, setToastVisible] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -39,6 +41,7 @@ export default function FoodScreen() {
       updatePoints(data.points);
       setFood(''); setHad(null);
       await load();
+      setToastVisible(true);
     } catch (e) {
       setError(apiErrorMessage(e));
     } finally {
@@ -101,6 +104,7 @@ export default function FoodScreen() {
       </View>
       </ResponsiveContainer>
 </ScrollView>
+<Toast message="Food entry saved successfully" visible={toastVisible} onHidden={() => setToastVisible(false)} />
 </KeyboardAvoider>
 </SafeAreaView>
   );

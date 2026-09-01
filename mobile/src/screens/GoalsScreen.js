@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { colors, spacing, radius } from '../theme';
 import KeyboardAvoider from '../components/KeyboardAvoider';
 import ResponsiveContainer from '../components/ResponsiveContainer';
+import Toast from '../components/Toast';
 import api, { apiErrorMessage } from '../api';
 
 function todayISO() { return new Date().toISOString().slice(0, 10); }
@@ -23,6 +24,7 @@ export default function GoalsScreen() {
   const [text, setText] = useState('');
   const [deadline, setDeadline] = useState(todayISO());
   const [error, setError] = useState('');
+  const [toastVisible, setToastVisible] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -41,6 +43,7 @@ export default function GoalsScreen() {
       await api.post('/api/goals', { text: text.trim(), deadline: deadline.trim() });
       setText('');
       await load();
+      setToastVisible(true);
     } catch (e) { setError(apiErrorMessage(e)); }
   }
   async function toggleGoal(id) {
@@ -99,6 +102,7 @@ export default function GoalsScreen() {
       </View>
       </ResponsiveContainer>
 </ScrollView>
+<Toast message="Goal saved successfully" visible={toastVisible} onHidden={() => setToastVisible(false)} />
 </KeyboardAvoider>
   );
 }

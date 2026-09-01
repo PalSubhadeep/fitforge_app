@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { Text } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { colors } from './src/theme';
 import { ensureAndroidChannel } from './src/utils/notifications';
 import ErrorBoundary from './src/components/ErrorBoundary';
+import SplashScreen from './src/components/SplashScreen';
 
 import SignupScreen from './src/screens/SignupScreen';
 import VerifyScreen from './src/screens/VerifyScreen';
@@ -93,22 +94,29 @@ function MainTabs() {
   );
 }
 
+// Matches the web app's SPLASH_MIN_MS — the splash always shows for at least this
+// long, even if the auth check resolves instantly, so it never just flickers.
+const SPLASH_MIN_MS = 1400;
+
 function Root() {
   const { user, booting } = useAuth();
+  const [minTimeElapsed, setMinTimeElapsed] = React.useState(false);
+  const [splashHidden, setSplashHidden] = React.useState(false);
 
-  if (booting) {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator color={colors.gold} size="large" />
-        <Text style={styles.loadingText}>Loading FitForge…</Text>
-      </View>
-    );
-  }
+  React.useEffect(() => {
+    const t = setTimeout(() => setMinTimeElapsed(true), SPLASH_MIN_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  const readyToHideSplash = !booting && minTimeElapsed;
 
   return (
     <NavigationContainer theme={navTheme}>
       <StatusBar style="light" />
       {user ? <MainTabs /> : <AuthNavigator />}
+      {!splashHidden && (
+        <SplashScreen hide={readyToHideSplash} onHidden={() => setSplashHidden(true)} />
+      )}
     </NavigationContainer>
   );
 }
@@ -132,7 +140,4 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  loading: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', gap: 12 },
-  loadingText: { color: colors.muted, fontSize: 13 }
-});
+
